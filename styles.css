@@ -2,8 +2,8 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Courier New', monospace;
-    background: #0a0a23 url('https://www.transparenttextures.com/patterns/stardust.png');
-    color: #fff;
+    background: #e6e6e6; /* Pale gray background */
+    color: #333; /* Dark gray text */
     overflow: hidden;
 }
 
@@ -11,6 +11,7 @@ header {
     padding: 0;
     text-align: center;
     height: 100vh;
+    background: #f0f0f0; /* Slightly lighter gray for game area */
 }
 
 #nav-links {
@@ -20,12 +21,12 @@ header {
 }
 
 .nav-link {
-    color: #fff;
+    color: #333;
     text-decoration: none;
-    background: rgba(255, 0, 255, 0.3);
-    border: 2px solid #ff00ff;
+    background: #d9d9d9; /* Pale gray button */
+    border: 2px solid #666; /* Darker gray border */
     display: block;
-    transition: box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
     cursor: pointer;
     font-size: 18px;
     position: absolute;
@@ -33,22 +34,25 @@ header {
 }
 
 .nav-link:hover {
-    box-shadow: 0 0 20px #ff00ff;
+    border-color: #4a90e2; /* Muted blue accent */
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
 }
 
 #paddle-left, #paddle-right {
-    width: 80px;         /* Wider, button-like */
-    height: 40px;        /* Shorter, button-like */
+    width: 80px;
+    height: 120px;       /* Taller paddles */
     padding: 10px;
-    border-radius: 8px;  /* Softer corners */
-    line-height: 40px;   /* Center text vertically */
+    border-radius: 6px;  /* Subtle rounding */
+    line-height: 120px;  /* Center text vertically */
 }
 
 #ball {
-    width: 30px;
-    height: 30px;
+    width: 90px;         /* Larger to fit "Projects" */
+    height: 90px;
     padding: 5px;
     border-radius: 50%;
+    font-size: 22px;     /* Bigger text for legibility */
+    line-height: 90px;   /* Center text */
 }
 
 nav ul {
@@ -62,15 +66,16 @@ nav ul li {
 }
 
 nav ul li a {
-    color: #fff;
+    color: #333;
     text-decoration: none;
     padding: 5px 10px;
-    border: 1px solid #00ffff;
-    border-radius: 5px;
+    border: 1px solid #666;
+    border-radius: 4px;
 }
 
 nav ul li a:hover {
-    background: rgba(0, 255, 255, 0.2);
+    background: #e0e0e0; /* Light gray hover */
+    border-color: #4a90e2;
 }
 
 section {
@@ -83,13 +88,14 @@ section {
 
 h1 {
     font-family: 'Courier New', monospace;
-    text-shadow: 0 0 10px #00ffff;
+    color: #4a90e2; /* Muted blue for headings */
+    text-shadow: 0 0 4px rgba(74, 144, 226, 0.3);
 }
 
 #scoreboard {
     font-size: 24px;
     margin-bottom: 10px;
-    text-shadow: 0 0 5px #ff00ff;
+    color: #666; /* Medium gray */
 }
 
 .project-grid {
@@ -99,23 +105,23 @@ h1 {
 }
 
 .project {
-    background: rgba(0, 255, 255, 0.1);
+    background: #e0e0e0;
     padding: 20px;
-    border-radius: 15px;
-    border: 2px dashed #00ffff;
+    border-radius: 6px;
+    border: 2px solid #999;
 }
 
 .project img {
     max-width: 100%;
     height: auto;
-    border-radius: 10px;
+    border-radius: 4px;
 }
 
 footer {
     text-align: center;
     padding: 10px;
-    background: rgba(0, 0, 0, 0.8);
-    box-shadow: 0 0 20px #ff00ff;
+    background: #d9d9d9;
+    color: #666;
     position: absolute;
     bottom: 0;
     width: 100%;
