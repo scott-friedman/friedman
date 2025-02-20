@@ -18,10 +18,10 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         }
     });
 
-    // Boundaries (thicker top and bottom walls)
+    // Boundaries
     const walls = [
-        Bodies.rectangle(window.innerWidth / 2, 0, window.innerWidth, 200, { isStatic: true, render: { visible: false }, restitution: 1 }), // Top, thicker and at edge
-        Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 200, { isStatic: true, render: { visible: false }, restitution: 1 }) // Bottom, thicker and at edge
+        Bodies.rectangle(window.innerWidth / 2, 0, window.innerWidth, 200, { isStatic: true, render: { visible: false }, restitution: 1 }),
+        Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 200, { isStatic: true, render: { visible: false }, restitution: 1 })
     ];
 
     // Create paddles and ball
@@ -29,7 +29,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
     const paddleRight = document.getElementById('paddle-right');
     const ball = document.getElementById('ball');
 
-    const paddleLeftBody = Bodies.rectangle(50, window.innerHeight / 2, 40, 120, {
+    const paddleLeftBody = Bodies.rectangle(50, window.innerHeight / 2, 100, 60, { // Match CSS + padding
         isStatic: false,
         restitution: 1.1,
         friction: 0,
@@ -41,7 +41,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
     });
     paddleLeftBody.linkElement = paddleLeft;
 
-    const paddleRightBody = Bodies.rectangle(window.innerWidth - 50, window.innerHeight / 2, 40, 120, {
+    const paddleRightBody = Bodies.rectangle(window.innerWidth - 50, window.innerHeight / 2, 100, 60, {
         isStatic: false,
         restitution: 1.1,
         friction: 0,
@@ -98,21 +98,23 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
             Matter.Body.setVelocity(paddleRightBody, { x: 0, y: 0 });
         }
 
-        // Keep paddles within vertical bounds
-        const paddleHeightHalf = 60;
-        if (paddleLeftBody.position.y < paddleHeightHalf) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: paddleHeightHalf });
-        if (paddleLeftBody.position.y > window.innerHeight - paddleHeightHalf) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: window.innerHeight - paddleHeightHalf });
-        if (paddleRightBody.position.y < paddleHeightHalf) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: paddleHeightHalf });
-        if (paddleRightBody.position.y > window.innerHeight - paddleHeightHalf) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: window.innerHeight - paddleHeightHalf });
+        // Keep paddles within vertical bounds (adjusted for new size)
+        const paddleHeightHalf = 30; // Half of 60px (physics height)
+        const topBound = paddleHeightHalf + 10; // Buffer from top
+        const bottomBound = window.innerHeight - paddleHeightHalf - 10; // Buffer from bottom
+        if (paddleLeftBody.position.y < topBound) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: topBound });
+        if (paddleLeftBody.position.y > bottomBound) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: bottomBound });
+        if (paddleRightBody.position.y < topBound) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: topBound });
+        if (paddleRightBody.position.y > bottomBound) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: bottomBound });
 
-        // Keep ball within top and bottom bounds (fallback)
+        // Keep ball within top and bottom bounds
         const ballRadius = 20;
         if (ballBody.position.y < ballRadius) {
             Matter.Body.setPosition(ballBody, { x: ballBody.position.x, y: ballRadius });
-            Matter.Body.setVelocity(ballBody, { x: ballBody.velocity.x, y: Math.abs(ballBody.velocity.y) }); // Bounce down
+            Matter.Body.setVelocity(ballBody, { x: ballBody.velocity.x, y: Math.abs(ballBody.velocity.y) });
         } else if (ballBody.position.y > window.innerHeight - ballRadius) {
             Matter.Body.setPosition(ballBody, { x: ballBody.position.x, y: window.innerHeight - ballRadius });
-            Matter.Body.setVelocity(ballBody, { x: ballBody.velocity.x, y: -Math.abs(ballBody.velocity.y) }); // Bounce up
+            Matter.Body.setVelocity(ballBody, { x: ballBody.velocity.x, y: -Math.abs(ballBody.velocity.y) });
         }
 
         // Score and reset ball (left/right bounds)
@@ -128,13 +130,21 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
             Matter.Body.setVelocity(ballBody, { x: -6, y: (Math.random() - 0.5) * 4 });
         }
 
-        // Prevent ball from getting stuck
+        // Add spin effect on collision
         const collisionLeft = Collision.collides(paddleLeftBody, ballBody);
         const collisionRight = Collision.collides(paddleRightBody, ballBody);
-        if (collisionLeft && collisionLeft.depth > 5) {
-            Matter.Body.setVelocity(ballBody, { x: Math.abs(ballBody.velocity.x) + 1, y: ballBody.velocity.y });
-        } else if (collisionRight && collisionRight.depth > 5) {
-            Matter.Body.setVelocity(ballBody, { x: -Math.abs(ballBody.velocity.x) - 1, y: ballBody.velocity.y });
+        if (collisionLeft) {
+            const paddleVelocityY = paddleLeftBody.velocity.y;
+            Matter.Body.setVelocity(ballBody, {
+                x: Math.abs(ballBody.velocity.x) + 1,
+                y: ballBody.velocity.y + (paddleVelocityY * 0.5) // Spin based on paddle speed
+            });
+        } else if (collisionRight) {
+            const paddleVelocityY = paddleRightBody.velocity.y;
+            Matter.Body.setVelocity(ballBody, {
+                x: -Math.abs(ballBody.velocity.x) - 1,
+                y: ballBody.velocity.y + (paddleVelocityY * 0.5)
+            });
         }
     });
 
