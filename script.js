@@ -1,11 +1,11 @@
 if (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
-    const { Engine, Render, World, Bodies } = Matter;
+    const { Engine, Render, World, Bodies, Collision } = Matter;
 
-    // Create engine and explicitly disable gravity
+    // Create engine and disable gravity
     const engine = Engine.create();
-    engine.gravity.x = 0; // No horizontal gravity
-    engine.gravity.y = 0; // No vertical gravity
-    engine.gravity.scale = 0; // Ensure gravity has no effect
+    engine.gravity.x = 0;
+    engine.gravity.y = 0;
+    engine.gravity.scale = 0;
 
     const render = Render.create({
         element: document.body,
@@ -18,10 +18,10 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         }
     });
 
-    // Boundaries (top and bottom walls only)
+    // Boundaries (top and bottom walls)
     const walls = [
-        Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, { isStatic: true, render: { visible: false } }), // Top
-        Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true, render: { visible: false } }) // Bottom
+        Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, { isStatic: true, render: { visible: false }, restitution: 1 }),
+        Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true, render: { visible: false }, restitution: 1 })
     ];
 
     // Create paddles and ball
@@ -31,37 +31,37 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
 
     const paddleLeftBody = Bodies.rectangle(50, window.innerHeight / 2, 40, 120, {
         isStatic: false,
-        restitution: 1,       // Perfect bounce
-        friction: 0,          // No friction
-        frictionAir: 0,       // No air resistance
-        frictionStatic: 0,    // No static friction
-        inertia: Infinity,    // Prevent rotation
-        mass: 1,              // Consistent mass
+        restitution: 1.1,    // Slightly over-elastic for better bounce
+        friction: 0,
+        frictionAir: 0,
+        frictionStatic: 0,
+        inertia: Infinity,
+        mass: 10,            // Heavier to push ball effectively
         render: { visible: false }
     });
     paddleLeftBody.linkElement = paddleLeft;
 
     const paddleRightBody = Bodies.rectangle(window.innerWidth - 50, window.innerHeight / 2, 40, 120, {
         isStatic: false,
-        restitution: 1,
+        restitution: 1.1,
         friction: 0,
         frictionAir: 0,
         frictionStatic: 0,
         inertia: Infinity,
-        mass: 1,
+        mass: 10,
         render: { visible: false }
     });
     paddleRightBody.linkElement = paddleRight;
 
     const ballBody = Bodies.circle(window.innerWidth / 2, window.innerHeight / 2, 20, {
-        restitution: 1,
+        restitution: 1,      // Perfect bounce
         friction: 0,
         frictionAir: 0,
         frictionStatic: 0,
-        mass: 0.5,           // Lighter for faster movement
+        mass: 0.5,           // Light for responsiveness
         render: { visible: false }
     });
-    Matter.Body.setVelocity(ballBody, { x: 5, y: 3 }); // Initial ball speed
+    Matter.Body.setVelocity(ballBody, { x: 6, y: 4 }); // Slightly faster initial speed
     ballBody.linkElement = ball;
 
     // Add to world
@@ -80,17 +80,17 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         // AI for right paddle (Contact)
         const ballY = ballBody.position.y;
         const paddleRightY = paddleRightBody.position.y;
-        const speed = 4;
+        const aiSpeed = 5;
         if (ballY < paddleRightY - 20) {
-            Matter.Body.setVelocity(paddleRightBody, { x: 0, y: -speed });
+            Matter.Body.setVelocity(paddleRightBody, { x: 0, y: -aiSpeed });
         } else if (ballY > paddleRightY + 20) {
-            Matter.Body.setVelocity(paddleRightBody, { x: 0, y: speed });
+            Matter.Body.setVelocity(paddleRightBody, { x: 0, y: aiSpeed });
         } else {
             Matter.Body.setVelocity(paddleRightBody, { x: 0, y: 0 });
         }
 
         // Keep paddles within bounds
-        const paddleHeightHalf = 60; // Half paddle height
+        const paddleHeightHalf = 60;
         if (paddleLeftBody.position.y < paddleHeightHalf) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: paddleHeightHalf });
         if (paddleLeftBody.position.y > window.innerHeight - paddleHeightHalf) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: window.innerHeight - paddleHeightHalf });
         if (paddleRightBody.position.y < paddleHeightHalf) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: paddleHeightHalf });
@@ -99,7 +99,16 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         // Reset ball if it goes off-screen (left or right)
         if (ballBody.position.x < -20 || ballBody.position.x > window.innerWidth + 20) {
             Matter.Body.setPosition(ballBody, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
-            Matter.Body.setVelocity(ballBody, { x: (Math.random() > 0.5 ? 5 : -5), y: (Math.random() - 0.5) * 4 });
+            Matter.Body.setVelocity(ballBody, { x: (ballBody.position.x < 0 ? 6 : -6), y: (Math.random() - 0.5) * 4 });
+        }
+
+        // Prevent ball from getting stuck
+        const collisionLeft = Collision.collides(paddleLeftBody, ballBody);
+        const collisionRight = Collision.collides(paddleRightBody, ballBody);
+        if (collisionLeft && collisionLeft.depth > 5) {
+            Matter.Body.setVelocity(ballBody, { x: Math.abs(ballBody.velocity.x) + 1, y: ballBody.velocity.y });
+        } else if (collisionRight && collisionRight.depth > 5) {
+            Matter.Body.setVelocity(ballBody, { x: -Math.abs(ballBody.velocity.x) - 1, y: ballBody.velocity.y });
         }
     });
 
