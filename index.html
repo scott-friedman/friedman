@@ -3,29 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Name - Pong Portfolio</title>
+    <title>Your Name - Modern Portfolio</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
-    <header>
-        <nav id="nav-container">
-            <ul id="nav-links">
-                <li><a href="about.html" class="nav-link" id="paddle-left">About</a></li>
-                <li><a href="projects.html" class="nav-link" id="ball">Projects</a></li>
-                <li><a href="contact.html" class="nav-link" id="paddle-right">Contact</a></li>
+    <header class="brand-header">
+        <h1>Your Name</h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#about" class="panel">About</a></li>
+                <li><a href="#projects" class="panel">Projects</a></li>
+                <li><a href="#contact" class="panel">Contact</a></li>
+                <li><a href="#" class="panel play-button">Play</a></li>
             </ul>
         </nav>
     </header>
 
-    <section id="home">
-        <div id="scoreboard">Player: 0 | AI: 0</div>
-        <h1>Scott's Website</h1>
-        <p>Use ↑/↓ keys to move "About" and spin "Projects." Click any button to visit its page.</p>
-    </section>
+    <main>
+        <section id="about" class="panel-content">
+            <h2>About Me</h2>
+            <p>I’m [Your Name], a [your role] passionate about [your interests].</p>
+        </section>
+        <section id="projects" class="panel-content">
+            <h2>Projects</h2>
+            <p>Explore my latest work, including [project examples].</p>
+        </section>
+        <section id="contact" class="panel-content">
+            <h2>Contact</h2>
+            <p>Reach me at [your-email] or [social links].</p>
+        </section>
+    </main>
 
     <footer>
-        <p>© 2025 Scott - A Modern Man</p>
+        <p>© 2025 [Your Name] - A Modern 8-Bit Experience</p>
     </footer>
 
     <script src="script.js"></script>
