@@ -4,10 +4,8 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
 
     // Create engine and disable gravity
     const engine = Engine.create();
-    engine.world.gravity.y = 0; // No vertical gravity
-    engine.world.gravity.x = 0; // No horizontal gravity
+    engine.world.gravity = { x: 0, y: 0 }; // Fully disable gravity
 
-    // Create renderer
     const render = Render.create({
         element: document.body,
         engine: engine,
@@ -19,7 +17,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         }
     });
 
-    // Create boundaries to keep links on-screen
+    // Create boundaries
     const walls = [
         Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, { isStatic: true, render: { visible: false } }), // Top
         Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true, render: { visible: false } }), // Bottom
@@ -41,16 +39,15 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
             rect.width + 20,
             rect.height + 20,
             {
-                restitution: 1,    // Perfectly elastic (bouncy) collisions
-                friction: 0,       // No surface friction
-                frictionAir: 0,    // No air resistance to slow them down
-                inertia: Infinity, // Prevent rotation for cleaner floating
+                restitution: 1,    // Perfectly elastic collisions
+                friction: 0,       // No friction
+                frictionAir: 0,    // No air resistance
+                inertia: Infinity, // Prevent rotation
                 render: { visible: false }
             }
         );
-        // Set initial random velocity
         Matter.Body.setVelocity(body, {
-            x: (Math.random() - 0.5) * 6, // -3 to 3 units/sec
+            x: (Math.random() - 0.5) * 6,
             y: (Math.random() - 0.5) * 6
         });
         linkBodies.push(body);
@@ -58,7 +55,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         body.linkElement = link;
     });
 
-    // Mouse interaction for dragging
+    // Mouse interaction
     const mouse = Mouse.create(render.canvas);
     const mouseConstraint = MouseConstraint.create(engine, {
         mouse: mouse,
@@ -66,12 +63,12 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
     });
     World.add(engine.world, mouseConstraint);
 
-    // Add objects to world and start engine
+    // Add objects and run
     World.add(engine.world, [...walls, ...linkBodies]);
     Engine.run(engine);
     Render.run(render);
 
-    // Update link positions to follow physics bodies
+    // Update link positions
     Matter.Events.on(engine, 'afterUpdate', () => {
         linkBodies.forEach((body) => {
             const link = body.linkElement;
@@ -81,11 +78,11 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         });
     });
 
-    // Ensure continuous floating by maintaining velocity
+    // Ensure continuous motion
     Matter.Events.on(engine, 'beforeUpdate', () => {
         linkBodies.forEach((body) => {
             const speed = Matter.Vector.magnitude(body.velocity);
-            if (speed < 2) { // If slowing down too much, give a nudge
+            if (speed < 2) {
                 Matter.Body.setVelocity(body, {
                     x: (Math.random() - 0.5) * 6,
                     y: (Math.random() - 0.5) * 6
@@ -94,7 +91,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         });
     });
 
-    // Handle link clicks
+    // Handle clicks
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
