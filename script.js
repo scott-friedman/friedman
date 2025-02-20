@@ -29,7 +29,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
     const paddleRight = document.getElementById('paddle-right');
     const ball = document.getElementById('ball');
 
-    const paddleLeftBody = Bodies.rectangle(50, window.innerHeight / 2, 100, 60, { // Match CSS + padding
+    const paddleLeftBody = Bodies.rectangle(50, window.innerHeight / 2, 100, 140, { // 80x120 + 10px padding each side
         isStatic: false,
         restitution: 1.1,
         friction: 0,
@@ -41,7 +41,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
     });
     paddleLeftBody.linkElement = paddleLeft;
 
-    const paddleRightBody = Bodies.rectangle(window.innerWidth - 50, window.innerHeight / 2, 100, 60, {
+    const paddleRightBody = Bodies.rectangle(window.innerWidth - 50, window.innerHeight / 2, 100, 140, {
         isStatic: false,
         restitution: 1.1,
         friction: 0,
@@ -53,7 +53,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
     });
     paddleRightBody.linkElement = paddleRight;
 
-    const ballBody = Bodies.circle(window.innerWidth / 2, window.innerHeight / 2, 20, {
+    const ballBody = Bodies.circle(window.innerWidth / 2, window.innerHeight / 2, 50, { // 90x90 + padding = ~100 diameter
         restitution: 1,
         friction: 0,
         frictionAir: 0,
@@ -61,7 +61,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         mass: 0.5,
         render: { visible: false }
     });
-    Matter.Body.setVelocity(ballBody, { x: 6, y: 4 });
+    Matter.Body.setVelocity(ballBody, { x: 5, y: 3 }); // Reduced from 6, 4
     ballBody.linkElement = ball;
 
     // Add to world
@@ -89,7 +89,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         // AI for right paddle (Contact)
         const ballY = ballBody.position.y;
         const paddleRightY = paddleRightBody.position.y;
-        const aiSpeed = 5;
+        const aiSpeed = 4; // Slightly slower AI
         if (ballY < paddleRightY - 20) {
             Matter.Body.setVelocity(paddleRightBody, { x: 0, y: -aiSpeed });
         } else if (ballY > paddleRightY + 20) {
@@ -98,17 +98,17 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
             Matter.Body.setVelocity(paddleRightBody, { x: 0, y: 0 });
         }
 
-        // Keep paddles within vertical bounds (adjusted for new size)
-        const paddleHeightHalf = 30; // Half of 60px (physics height)
-        const topBound = paddleHeightHalf + 10; // Buffer from top
-        const bottomBound = window.innerHeight - paddleHeightHalf - 10; // Buffer from bottom
+        // Keep paddles within vertical bounds
+        const paddleHeightHalf = 70; // Half of 140px
+        const topBound = paddleHeightHalf + 10;
+        const bottomBound = window.innerHeight - paddleHeightHalf - 10;
         if (paddleLeftBody.position.y < topBound) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: topBound });
         if (paddleLeftBody.position.y > bottomBound) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: bottomBound });
         if (paddleRightBody.position.y < topBound) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: topBound });
         if (paddleRightBody.position.y > bottomBound) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: bottomBound });
 
         // Keep ball within top and bottom bounds
-        const ballRadius = 20;
+        const ballRadius = 50;
         if (ballBody.position.y < ballRadius) {
             Matter.Body.setPosition(ballBody, { x: ballBody.position.x, y: ballRadius });
             Matter.Body.setVelocity(ballBody, { x: ballBody.velocity.x, y: Math.abs(ballBody.velocity.y) });
@@ -117,17 +117,17 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
             Matter.Body.setVelocity(ballBody, { x: ballBody.velocity.x, y: -Math.abs(ballBody.velocity.y) });
         }
 
-        // Score and reset ball (left/right bounds)
+        // Score and reset ball
         if (ballBody.position.x < -20) {
             aiScore++;
             scoreboard.textContent = `Player: ${playerScore} | AI: ${aiScore}`;
             Matter.Body.setPosition(ballBody, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
-            Matter.Body.setVelocity(ballBody, { x: 6, y: (Math.random() - 0.5) * 4 });
+            Matter.Body.setVelocity(ballBody, { x: 5, y: (Math.random() - 0.5) * 3 });
         } else if (ballBody.position.x > window.innerWidth + 20) {
             playerScore++;
             scoreboard.textContent = `Player: ${playerScore} | AI: ${aiScore}`;
             Matter.Body.setPosition(ballBody, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
-            Matter.Body.setVelocity(ballBody, { x: -6, y: (Math.random() - 0.5) * 4 });
+            Matter.Body.setVelocity(ballBody, { x: -5, y: (Math.random() - 0.5) * 3 });
         }
 
         // Add spin effect on collision
@@ -137,7 +137,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
             const paddleVelocityY = paddleLeftBody.velocity.y;
             Matter.Body.setVelocity(ballBody, {
                 x: Math.abs(ballBody.velocity.x) + 1,
-                y: ballBody.velocity.y + (paddleVelocityY * 0.5) // Spin based on paddle speed
+                y: ballBody.velocity.y + (paddleVelocityY * 0.5)
             });
         } else if (collisionRight) {
             const paddleVelocityY = paddleRightBody.velocity.y;
