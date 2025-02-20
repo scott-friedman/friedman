@@ -1,33 +1,50 @@
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #1a1a1a;
+    font-family: 'Courier New', monospace; /* Playful, retro font */
+    background: #0a0a23 url('https://www.transparenttextures.com/patterns/stardust.png'); /* Starry texture */
     color: #fff;
+    overflow-x: hidden; /* Prevent horizontal scroll from physics */
 }
 
 header {
     padding: 20px;
     text-align: center;
+    position: relative;
+    min-height: 100px; /* Space for falling links */
 }
 
-nav ul {
+#nav-links {
     list-style: none;
     padding: 0;
+    margin: 0;
+    position: relative;
 }
 
-nav ul li {
-    display: inline;
-    margin: 0 15px;
-}
-
-nav ul li a {
+.nav-link {
     color: #fff;
     text-decoration: none;
+    padding: 10px 20px;
+    background: rgba(255, 0, 255, 0.2); /* Neon magenta glow */
+    border: 2px solid #ff00ff;
+    border-radius: 10px;
+    display: inline-block;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.nav-link:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #ff00ff;
 }
 
 section {
     padding: 50px;
     text-align: center;
+}
+
+h1, h2 {
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 10px #00ffff; /* Cyan glow */
 }
 
 .project-grid {
@@ -36,13 +53,30 @@ section {
     gap: 20px;
 }
 
+.project {
+    background: rgba(0, 255, 255, 0.1); /* Cyan tint */
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px dashed #00ffff;
+}
+
 .project img {
     max-width: 100%;
     height: auto;
+    border-radius: 10px;
 }
 
 footer {
     text-align: center;
     padding: 20px;
-    background: #333;
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 20px #ff00ff;
+}
+
+/* Matter.js canvas styling */
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1; /* Behind content */
 }
