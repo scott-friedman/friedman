@@ -8,7 +8,7 @@ body {
 }
 
 header {
-    padding: 0; /* No padding for full-screen game */
+    padding: 0;
     text-align: center;
     height: 100vh;
 }
@@ -24,7 +24,7 @@ header {
     text-decoration: none;
     background: rgba(255, 0, 255, 0.3);
     border: 2px solid #ff00ff;
-    display: block; /* Block for paddle/ball shapes */
+    display: block;
     transition: box-shadow 0.2s;
     cursor: pointer;
     font-size: 18px;
@@ -36,7 +36,6 @@ header {
     box-shadow: 0 0 20px #ff00ff;
 }
 
-/* Paddle styling */
 #paddle-left, #paddle-right {
     width: 20px;
     height: 100px;
@@ -44,15 +43,13 @@ header {
     border-radius: 10px;
 }
 
-/* Ball styling */
 #ball {
     width: 30px;
     height: 30px;
     padding: 5px;
-    border-radius: 50%; /* Circular ball */
+    border-radius: 50%;
 }
 
-/* Regular nav for other pages */
 nav ul {
     list-style: none;
     padding: 0;
@@ -86,6 +83,12 @@ section {
 h1 {
     font-family: 'Courier New', monospace;
     text-shadow: 0 0 10px #00ffff;
+}
+
+#scoreboard {
+    font-size: 24px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 5px #ff00ff;
 }
 
 .project-grid {
