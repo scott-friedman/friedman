@@ -18,10 +18,10 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         }
     });
 
-    // Boundaries
+    // Boundaries (thicker top and bottom walls)
     const walls = [
-        Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, { isStatic: true, render: { visible: false }, restitution: 1 }),
-        Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true, render: { visible: false }, restitution: 1 })
+        Bodies.rectangle(window.innerWidth / 2, 0, window.innerWidth, 200, { isStatic: true, render: { visible: false }, restitution: 1 }), // Top, thicker and at edge
+        Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 200, { isStatic: true, render: { visible: false }, restitution: 1 }) // Bottom, thicker and at edge
     ];
 
     // Create paddles and ball
@@ -36,7 +36,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         frictionAir: 0,
         frictionStatic: 0,
         inertia: Infinity,
-        mass: 1000,          // Very heavy to resist ball push
+        mass: 1000,
         render: { visible: false }
     });
     paddleLeftBody.linkElement = paddleLeft;
@@ -105,7 +105,17 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         if (paddleRightBody.position.y < paddleHeightHalf) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: paddleHeightHalf });
         if (paddleRightBody.position.y > window.innerHeight - paddleHeightHalf) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: window.innerHeight - paddleHeightHalf });
 
-        // Score and reset ball
+        // Keep ball within top and bottom bounds (fallback)
+        const ballRadius = 20;
+        if (ballBody.position.y < ballRadius) {
+            Matter.Body.setPosition(ballBody, { x: ballBody.position.x, y: ballRadius });
+            Matter.Body.setVelocity(ballBody, { x: ballBody.velocity.x, y: Math.abs(ballBody.velocity.y) }); // Bounce down
+        } else if (ballBody.position.y > window.innerHeight - ballRadius) {
+            Matter.Body.setPosition(ballBody, { x: ballBody.position.x, y: window.innerHeight - ballRadius });
+            Matter.Body.setVelocity(ballBody, { x: ballBody.velocity.x, y: -Math.abs(ballBody.velocity.y) }); // Bounce up
+        }
+
+        // Score and reset ball (left/right bounds)
         if (ballBody.position.x < -20) {
             aiScore++;
             scoreboard.textContent = `Player: ${playerScore} | AI: ${aiScore}`;
