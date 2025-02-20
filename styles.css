@@ -37,10 +37,11 @@ header {
 }
 
 #paddle-left, #paddle-right {
-    width: 20px;
-    height: 100px;
+    width: 80px;         /* Wider, button-like */
+    height: 40px;        /* Shorter, button-like */
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 8px;  /* Softer corners */
+    line-height: 40px;   /* Center text vertically */
 }
 
 #ball {
