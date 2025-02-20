@@ -8,9 +8,9 @@ body {
 }
 
 header {
-    padding: 20px;
+    padding: 0; /* No padding for full-screen game */
     text-align: center;
-    height: 100vh; /* Full screen for floating */
+    height: 100vh;
 }
 
 #nav-links {
@@ -22,19 +22,34 @@ header {
 .nav-link {
     color: #fff;
     text-decoration: none;
-    padding: 15px 25px;
     background: rgba(255, 0, 255, 0.3);
     border: 2px solid #ff00ff;
-    border-radius: 15px;
-    display: inline-block;
+    display: block; /* Block for paddle/ball shapes */
     transition: box-shadow 0.2s;
     cursor: pointer;
     font-size: 18px;
-    position: absolute; /* Absolute positioning for floating */
+    position: absolute;
+    text-align: center;
 }
 
 .nav-link:hover {
     box-shadow: 0 0 20px #ff00ff;
+}
+
+/* Paddle styling */
+#paddle-left, #paddle-right {
+    width: 20px;
+    height: 100px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Ball styling */
+#ball {
+    width: 30px;
+    height: 30px;
+    padding: 5px;
+    border-radius: 50%; /* Circular ball */
 }
 
 /* Regular nav for other pages */
@@ -61,8 +76,11 @@ nav ul li a:hover {
 }
 
 section {
-    padding: 50px;
+    padding: 20px;
     text-align: center;
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
 }
 
 h1 {
@@ -91,9 +109,12 @@ h1 {
 
 footer {
     text-align: center;
-    padding: 20px;
+    padding: 10px;
     background: rgba(0, 0, 0, 0.8);
     box-shadow: 0 0 20px #ff00ff;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }
 
 canvas {
