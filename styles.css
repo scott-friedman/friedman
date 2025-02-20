@@ -40,19 +40,19 @@ header {
 
 #paddle-left, #paddle-right {
     width: 80px;
-    height: 120px;       /* Taller paddles */
+    height: 150px;       /* Taller paddles (was 120px) */
     padding: 10px;
     border-radius: 6px;  /* Subtle rounding */
-    line-height: 120px;  /* Center text vertically */
+    line-height: 150px;  /* Center text vertically */
 }
 
 #ball {
-    width: 90px;         /* Larger to fit "Projects" */
-    height: 90px;
+    width: 110px;        /* Larger ball (was 90px) */
+    height: 110px;
     padding: 5px;
     border-radius: 50%;
-    font-size: 22px;     /* Bigger text for legibility */
-    line-height: 90px;   /* Center text */
+    font-size: 26px;     /* Bigger text for legibility */
+    line-height: 110px;  /* Center text */
 }
 
 nav ul {
