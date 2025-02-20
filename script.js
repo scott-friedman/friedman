@@ -1,9 +1,11 @@
 if (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
     const { Engine, Render, World, Bodies } = Matter;
 
-    // Create engine and disable gravity
+    // Create engine and explicitly disable gravity
     const engine = Engine.create();
-    engine.world.gravity = { x: 0, y: 0 };
+    engine.gravity.x = 0; // No horizontal gravity
+    engine.gravity.y = 0; // No vertical gravity
+    engine.gravity.scale = 0; // Ensure gravity has no effect
 
     const render = Render.create({
         element: document.body,
@@ -29,10 +31,12 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
 
     const paddleLeftBody = Bodies.rectangle(50, window.innerHeight / 2, 40, 120, {
         isStatic: false,
-        restitution: 1,
-        friction: 0,
-        frictionAir: 0,
-        inertia: Infinity,
+        restitution: 1,       // Perfect bounce
+        friction: 0,          // No friction
+        frictionAir: 0,       // No air resistance
+        frictionStatic: 0,    // No static friction
+        inertia: Infinity,    // Prevent rotation
+        mass: 1,              // Consistent mass
         render: { visible: false }
     });
     paddleLeftBody.linkElement = paddleLeft;
@@ -42,7 +46,9 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         restitution: 1,
         friction: 0,
         frictionAir: 0,
+        frictionStatic: 0,
         inertia: Infinity,
+        mass: 1,
         render: { visible: false }
     });
     paddleRightBody.linkElement = paddleRight;
@@ -51,6 +57,8 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         restitution: 1,
         friction: 0,
         frictionAir: 0,
+        frictionStatic: 0,
+        mass: 0.5,           // Lighter for faster movement
         render: { visible: false }
     });
     Matter.Body.setVelocity(ballBody, { x: 5, y: 3 }); // Initial ball speed
@@ -61,7 +69,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
     Engine.run(engine);
     Render.run(render);
 
-    // Update positions
+    // Update positions and game logic
     Matter.Events.on(engine, 'afterUpdate', () => {
         [paddleLeftBody, paddleRightBody, ballBody].forEach((body) => {
             const link = body.linkElement;
@@ -82,10 +90,11 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         }
 
         // Keep paddles within bounds
-        if (paddleLeftBody.position.y < 60) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: 60 });
-        if (paddleLeftBody.position.y > window.innerHeight - 60) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: window.innerHeight - 60 });
-        if (paddleRightBody.position.y < 60) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: 60 });
-        if (paddleRightBody.position.y > window.innerHeight - 60) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: window.innerHeight - 60 });
+        const paddleHeightHalf = 60; // Half paddle height
+        if (paddleLeftBody.position.y < paddleHeightHalf) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: paddleHeightHalf });
+        if (paddleLeftBody.position.y > window.innerHeight - paddleHeightHalf) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: window.innerHeight - paddleHeightHalf });
+        if (paddleRightBody.position.y < paddleHeightHalf) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: paddleHeightHalf });
+        if (paddleRightBody.position.y > window.innerHeight - paddleHeightHalf) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: window.innerHeight - paddleHeightHalf });
 
         // Reset ball if it goes off-screen (left or right)
         if (ballBody.position.x < -20 || ballBody.position.x > window.innerWidth + 20) {
