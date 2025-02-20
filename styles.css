@@ -3,14 +3,14 @@ body {
     font-family: 'Courier New', monospace;
     background: #0a0a23 url('https://www.transparenttextures.com/patterns/stardust.png');
     color: #fff;
-    overflow-x: hidden;
+    overflow: hidden; /* Keep links from drifting off-screen */
 }
 
 header {
     padding: 20px;
     text-align: center;
     position: relative;
-    min-height: 100px; /* Space for falling links on index */
+    height: 100vh; /* Full screen for floating */
 }
 
 #nav-links {
@@ -22,18 +22,18 @@ header {
 .nav-link {
     color: #fff;
     text-decoration: none;
-    padding: 10px 20px;
-    background: rgba(255, 0, 255, 0.2);
+    padding: 15px 25px; /* Bigger for visibility */
+    background: rgba(255, 0, 255, 0.3);
     border: 2px solid #ff00ff;
-    border-radius: 10px;
+    border-radius: 15px; /* Rounded for bounce effect */
     display: inline-block;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: box-shadow 0.2s;
     cursor: pointer;
+    font-size: 18px;
 }
 
 .nav-link:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 15px #ff00ff;
+    box-shadow: 0 0 20px #ff00ff; /* Glow on hover */
 }
 
 /* Regular nav for other pages */
