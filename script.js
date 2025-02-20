@@ -4,6 +4,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
 
     // Create engine and renderer
     const engine = Engine.create();
+    engine.world.gravity.y = 0; // Disable gravity
     const render = Render.create({
         element: document.body,
         engine: engine,
@@ -16,32 +17,40 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
     });
 
     // Create boundaries
-    const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true, render: { visible: false } });
-    const leftWall = Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true, render: { visible: false } });
-    const rightWall = Bodies.rectangle(window.innerWidth + 50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true, render: { visible: false } });
+    const walls = [
+        Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, { isStatic: true, render: { visible: false } }), // Top
+        Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true, render: { visible: false } }), // Bottom
+        Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true, render: { visible: false } }), // Left
+        Bodies.rectangle(window.innerWidth + 50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true, render: { visible: false } }) // Right
+    ];
 
-    // Create link bodies with spaced-out starting positions
+    // Create floating links
     const navLinks = document.querySelectorAll('.nav-link');
     const linkBodies = [];
-    const initialPositions = [];
 
     navLinks.forEach((link, index) => {
         const rect = link.getBoundingClientRect();
-        const startX = window.innerWidth / 4 + index * (window.innerWidth / 4); // Spread across width
+        const startX = window.innerWidth * 0.2 + index * (window.innerWidth * 0.25); // Spaced initial positions
+        const startY = window.innerHeight * 0.3 + Math.random() * 100; // Random Y start
         const body = Bodies.rectangle(
             startX,
-            50,
+            startY,
             rect.width + 20,
             rect.height + 20,
             {
-                restitution: 0.8, // Bounciness
-                friction: 0.05,   // Less friction for more sliding
-                density: 0.001,   // Lighter for varied falling
+                restitution: 1,    // Perfectly elastic collisions (bouncy)
+                friction: 0,       // No friction for smooth floating
+                frictionAir: 0,    // No air resistance
+                density: 0.001,    // Light for gentle movement
                 render: { visible: false }
             }
         );
+        // Random initial velocity
+        Matter.Body.setVelocity(body, {
+            x: (Math.random() - 0.5) * 5, // -2.5 to 2.5
+            y: (Math.random() - 0.5) * 5
+        });
         linkBodies.push(body);
-        initialPositions.push({ x: startX, y: 50 });
         World.add(engine.world, body);
         body.linkElement = link;
     });
@@ -54,8 +63,8 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
     });
     World.add(engine.world, mouseConstraint);
 
-    // Add world objects and run
-    World.add(engine.world, [ground, leftWall, rightWall, ...linkBodies]);
+    // Add objects and run
+    World.add(engine.world, [...walls, ...linkBodies]);
     Engine.run(engine);
     Render.run(render);
 
@@ -69,24 +78,11 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         });
     });
 
-    // Drop after 2 seconds
-    setTimeout(() => {
-        linkBodies.forEach(body => Matter.Body.setStatic(body, false));
-    }, 2000);
-
-    // Reset function
-    function resetLinks() {
-        linkBodies.forEach((body, index) => {
-            Matter.Body.setPosition(body, initialPositions[index]);
-            Matter.Body.setVelocity(body, { x: 0, y: 0 });
-            Matter.Body.setAngularVelocity(body, 0);
-            Matter.Body.setStatic(body, true); // Hold until next drop
+    // Handle clicks manually (Matter.js can intercept default behavior)
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = link.getAttribute('href');
         });
-        setTimeout(() => {
-            linkBodies.forEach(body => Matter.Body.setStatic(body, false));
-        }, 2000); // Drop again after reset
-    }
-
-    // Double-click to reset
-    document.body.addEventListener('dblclick', resetLinks);
+    });
 }
