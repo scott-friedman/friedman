@@ -18,7 +18,7 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         }
     });
 
-    // Boundaries (top and bottom walls)
+    // Boundaries
     const walls = [
         Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, { isStatic: true, render: { visible: false }, restitution: 1 }),
         Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true, render: { visible: false }, restitution: 1 })
@@ -31,12 +31,12 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
 
     const paddleLeftBody = Bodies.rectangle(50, window.innerHeight / 2, 40, 120, {
         isStatic: false,
-        restitution: 1.1,    // Slightly over-elastic for better bounce
+        restitution: 1.1,
         friction: 0,
         frictionAir: 0,
         frictionStatic: 0,
         inertia: Infinity,
-        mass: 10,            // Heavier to push ball effectively
+        mass: 1000,          // Very heavy to resist ball push
         render: { visible: false }
     });
     paddleLeftBody.linkElement = paddleLeft;
@@ -48,26 +48,31 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
         frictionAir: 0,
         frictionStatic: 0,
         inertia: Infinity,
-        mass: 10,
+        mass: 1000,
         render: { visible: false }
     });
     paddleRightBody.linkElement = paddleRight;
 
     const ballBody = Bodies.circle(window.innerWidth / 2, window.innerHeight / 2, 20, {
-        restitution: 1,      // Perfect bounce
+        restitution: 1,
         friction: 0,
         frictionAir: 0,
         frictionStatic: 0,
-        mass: 0.5,           // Light for responsiveness
+        mass: 0.5,
         render: { visible: false }
     });
-    Matter.Body.setVelocity(ballBody, { x: 6, y: 4 }); // Slightly faster initial speed
+    Matter.Body.setVelocity(ballBody, { x: 6, y: 4 });
     ballBody.linkElement = ball;
 
     // Add to world
     World.add(engine.world, [paddleLeftBody, paddleRightBody, ballBody, ...walls]);
     Engine.run(engine);
     Render.run(render);
+
+    // Scoreboard
+    let playerScore = 0;
+    let aiScore = 0;
+    const scoreboard = document.getElementById('scoreboard');
 
     // Update positions and game logic
     Matter.Events.on(engine, 'afterUpdate', () => {
@@ -76,6 +81,10 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
             link.style.left = `${body.position.x - link.offsetWidth / 2}px`;
             link.style.top = `${body.position.y - link.offsetHeight / 2}px`;
         });
+
+        // Lock paddle x-positions
+        Matter.Body.setPosition(paddleLeftBody, { x: 50, y: paddleLeftBody.position.y });
+        Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: paddleRightBody.position.y });
 
         // AI for right paddle (Contact)
         const ballY = ballBody.position.y;
@@ -89,17 +98,24 @@ if (window.location.pathname === '/' || window.location.pathname.endsWith('index
             Matter.Body.setVelocity(paddleRightBody, { x: 0, y: 0 });
         }
 
-        // Keep paddles within bounds
+        // Keep paddles within vertical bounds
         const paddleHeightHalf = 60;
         if (paddleLeftBody.position.y < paddleHeightHalf) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: paddleHeightHalf });
         if (paddleLeftBody.position.y > window.innerHeight - paddleHeightHalf) Matter.Body.setPosition(paddleLeftBody, { x: 50, y: window.innerHeight - paddleHeightHalf });
         if (paddleRightBody.position.y < paddleHeightHalf) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: paddleHeightHalf });
         if (paddleRightBody.position.y > window.innerHeight - paddleHeightHalf) Matter.Body.setPosition(paddleRightBody, { x: window.innerWidth - 50, y: window.innerHeight - paddleHeightHalf });
 
-        // Reset ball if it goes off-screen (left or right)
-        if (ballBody.position.x < -20 || ballBody.position.x > window.innerWidth + 20) {
+        // Score and reset ball
+        if (ballBody.position.x < -20) {
+            aiScore++;
+            scoreboard.textContent = `Player: ${playerScore} | AI: ${aiScore}`;
             Matter.Body.setPosition(ballBody, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
-            Matter.Body.setVelocity(ballBody, { x: (ballBody.position.x < 0 ? 6 : -6), y: (Math.random() - 0.5) * 4 });
+            Matter.Body.setVelocity(ballBody, { x: 6, y: (Math.random() - 0.5) * 4 });
+        } else if (ballBody.position.x > window.innerWidth + 20) {
+            playerScore++;
+            scoreboard.textContent = `Player: ${playerScore} | AI: ${aiScore}`;
+            Matter.Body.setPosition(ballBody, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
+            Matter.Body.setVelocity(ballBody, { x: -6, y: (Math.random() - 0.5) * 4 });
         }
 
         // Prevent ball from getting stuck
